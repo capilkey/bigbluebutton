@@ -90,17 +90,6 @@ package org.bigbluebutton.lib.user.models {
 			verifyUserStatus();
 		}
 		
-		private var _hasStream:Boolean = false;
-		
-		public function get hasStream():Boolean {
-			return _hasStream;
-		}
-		
-		public function set hasStream(s:Boolean):void {
-			_hasStream = s;
-			verifyMedia();
-		}
-		
 		private var _voiceUserId:String;
 		
 		public function get voiceUserId():String {
@@ -155,7 +144,66 @@ package org.bigbluebutton.lib.user.models {
 			_locked = value;
 		}
 		
-		public var streamName:String = "";
+		public var streamNames:Array = new Array();
+		
+		public function get hasStream():Boolean {
+			return streamNames.length > 0;
+		}
+		
+		public function sharedWebcam(stream:String):Boolean {
+			if (stream && stream != "" && !hasThisStream(stream)) {
+				streamNames.push(stream);
+				verifyMedia();
+				return true;
+			}
+			
+			return false;
+		}
+		
+		public function unsharedWebcam(stream:String):void {
+			streamNames = streamNames.filter(function(item:*, index:int, array:Array):Boolean {
+				return item != stream;
+			});
+			verifyMedia();
+		}
+		
+		private function hasThisStream(streamName:String):Boolean {
+			return streamNames.some(function(item:*, index:int, array:Array):Boolean {
+				return item == streamName;
+			});
+		}
+		
+		public var viewingStreams:Array = new Array();
+		
+		public function addViewingStream(streamName:String):Boolean {
+			if (isViewingStream(streamName)) {
+				return false;
+			}
+			
+			viewingStreams.push(streamName);
+			return true;
+		}
+		
+		public function removeViewingStream(streamName:String):Boolean {
+			if (!isViewingStream(streamName)) {
+				return false;
+			}
+			
+			viewingStreams = viewingStreams.filter(function(item:*, index:int, array:Array):Boolean {
+				return item != streamName;
+			});
+			return true;
+		}
+		
+		private function isViewingStream(streamName:String):Boolean {
+			return viewingStreams.some(function(item:*, index:int, array:Array):Boolean {
+				return item == streamName;
+			});
+		}
+		
+		public function isViewingAllStreams():Boolean {
+			return viewingStreams.length == streamNames.length;
+		}
 		
 		// This used to only be used for accessibility and doesn't need to be filled in yet. - Chad
 		private function verifyUserStatus():void {

@@ -82,11 +82,8 @@ package org.bigbluebutton.lib.video.services {
 		}
 		
 		public function connect():void {
-			var uri:String = _applicationURI + "/" + conferenceParameters.room;
-			var connectParams:Array = [
-				conferenceParameters.room,
-				conferenceParameters.internalUserID
-				];
+			var uri:String = _applicationURI;
+			var connectParams:Array = [conferenceParameters.room, conferenceParameters.internalUserID];
 			baseConnection.connect.apply(null, new Array(uri).concat(connectParams));
 		}
 		

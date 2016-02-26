@@ -104,8 +104,6 @@ package org.bigbluebutton.lib.user.services {
 		
 		private function addParticipant(newUser:Object):void {
 			var user:User = new User();
-			user.hasStream = newUser.hasStream;
-			user.streamName = newUser.webcamStream;
 			user.locked = newUser.locked;
 			user.name = newUser.name;
 			user.phoneUser = newUser.phoneUser;
@@ -118,6 +116,14 @@ package org.bigbluebutton.lib.user.services {
 			user.isLeavingFlag = false;
 			user.listenOnly = newUser.listenOnly;
 			user.muted = newUser.voiceUser.muted;
+			
+			if (newUser.hasStream) {
+				var streams:Array = newUser.webcamStream;
+				for each (var stream:String in streams) {
+					user.sharedWebcam(stream);
+				}
+			}
+			
 			userSession.userList.addUser(user);
 			// The following properties are 'special', in that they have view changes associated with them.
 			// The UserList changes the model appropriately, then dispatches a signal to the views.

@@ -30,7 +30,7 @@ package org.bigbluebutton.web.user.views {
 			view.raiseHandButton.addEventListener(MouseEvent.CLICK, handleRaiseHandButtonClick);
 		}
 		
-		private function userChangeHandler(user:User, type:int):void {
+		private function userChangeHandler(user:User, type:int, info:Object):void {
 			if (user.me && type == UserList.RAISE_HAND) {
 				view.raiseHandButton.selected = user.raiseHand;
 			}
@@ -61,12 +61,15 @@ package org.bigbluebutton.web.user.views {
 		}
 		
 		override public function destroy():void {
-			super.destroy();
+			userSession.userList.userChangeSignal.remove(userChangeHandler);
+			
 			view.lowerHandSignal.remove(onLowerHandSignal);
 			view.changePresenterSignal.remove(onChangePresenterSignal);
 			view.changeMuteSignal.remove(onChangeMuteSignal);
 			view.kickUserSignal.remove(onKickUserSignal);
 			view.raiseHandButton.removeEventListener(MouseEvent.CLICK, handleRaiseHandButtonClick);
+			
+			super.destroy();
 			view = null;
 		}
 	}

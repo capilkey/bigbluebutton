@@ -8,6 +8,7 @@ package org.bigbluebutton.web.main.commands {
 	import org.bigbluebutton.lib.main.models.IConferenceParameters;
 	import org.bigbluebutton.lib.main.models.IUserSession;
 	import org.bigbluebutton.lib.main.services.ILoginService;
+	import org.bigbluebutton.lib.video.commands.SetupVideoProfilesSignal;
 	
 	import robotlegs.bender.bundles.mvcs.Command;
 	
@@ -32,6 +33,9 @@ package org.bigbluebutton.web.main.commands {
 		[Inject]
 		public var connectingFailedSignal:ConnectingFailedSignal;
 		
+		[Inject]
+		public var setupVideoProfilesSignal:SetupVideoProfilesSignal;
+		
 		override public function execute():void {
 			var urlRequest:URLRequest = new URLRequest();
 			
@@ -49,6 +53,8 @@ package org.bigbluebutton.web.main.commands {
 		
 		protected function configSuccess(config:Config):void {
 			userSession.config = config;
+			
+			setupVideoProfilesSignal.dispatch(config.application.host.toString());
 		}
 		
 		protected function loginFailure(reason:String):void {

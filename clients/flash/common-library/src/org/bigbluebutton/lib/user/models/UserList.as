@@ -1,14 +1,15 @@
 package org.bigbluebutton.lib.user.models {
 	
 	import mx.collections.ArrayCollection;
+	
 	import org.osflash.signals.ISignal;
 	import org.osflash.signals.Signal;
+	
 	import robotlegs.bender.extensions.signalCommandMap.api.ISignalCommandMap;
+	
 	import spark.collections.Sort;
 	
 	public class UserList {
-		public static const HAS_STREAM:int = 1;
-		
 		public static const PRESENTER:int = 2;
 		
 		public static const JOIN_AUDIO:int = 3;
@@ -20,6 +21,10 @@ package org.bigbluebutton.lib.user.models {
 		public static const LOCKED:int = 6;
 		
 		public static const LISTEN_ONLY:int = 7;
+		
+		public static const START_STREAM:int = 8;
+		
+		public static const STOP_STREAM:int = 9;
 		
 		private var _users:ArrayCollection;
 		
@@ -80,7 +85,7 @@ package org.bigbluebutton.lib.user.models {
 		}
 		
 		/**
-		 * Dispatched when a users' property have been changed
+		 * Dispatched when a users' property has been changed
 		 */
 		private var _userChangeSignal:Signal = new Signal();
 		
@@ -159,17 +164,14 @@ package org.bigbluebutton.lib.user.models {
 				}
 				_users.addItem(newuser);
 				_users.refresh();
-				if (newuser.hasStream) {
-					userChangeSignal.dispatch(newuser, HAS_STREAM);
-				}
 				if (newuser.presenter) {
-					userChangeSignal.dispatch(newuser, PRESENTER);
+					userChangeSignal.dispatch(newuser, PRESENTER, null);
 				}
 				if (newuser.raiseHand) {
-					userChangeSignal.dispatch(newuser, RAISE_HAND);
+					userChangeSignal.dispatch(newuser, RAISE_HAND, null);
 				}
 				if (newuser.listenOnly) {
-					userChangeSignal.dispatch(newuser, LISTEN_ONLY);
+					userChangeSignal.dispatch(newuser, LISTEN_ONLY, null);
 				}
 				userAddedSignal.dispatch(newuser);
 			}
@@ -233,7 +235,7 @@ package org.bigbluebutton.lib.user.models {
 			var u:User = getPresenter();
 			if (u.presenter) {
 				u.presenter = false;
-				userChangeSignal.dispatch(u, PRESENTER);
+				userChangeSignal.dispatch(u, PRESENTER, null);
 				if (u.me)
 					_me.presenter = false;
 			}
@@ -245,7 +247,7 @@ package org.bigbluebutton.lib.user.models {
 			if (p) {
 				var user:User = p.participant as User;
 				user.presenter = true;
-				userChangeSignal.dispatch(user, PRESENTER);
+				userChangeSignal.dispatch(user, PRESENTER, null);
 				if (user.me)
 					_me.presenter = true;
 			}
@@ -257,13 +259,17 @@ package org.bigbluebutton.lib.user.models {
 			}
 		}
 		
-		public function userStreamChange(userID:String, hasStream:Boolean, streamName:String):void {
+		public function userStreamChange(userID:String, newStream:Boolean, streamName:String):void {
 			var p:Object = getUserIndex(userID);
 			if (p) {
 				var user:User = p.participant as User;
-				user.hasStream = hasStream;
-				user.streamName = streamName;
-				userChangeSignal.dispatch(user, HAS_STREAM);
+				if (newStream) {
+					user.sharedWebcam(streamName);
+					userChangeSignal.dispatch(user, START_STREAM, streamName);
+				} else {
+					user.unsharedWebcam(streamName);
+					userChangeSignal.dispatch(user, STOP_STREAM, streamName);
+				}
 			}
 		}
 		
@@ -272,7 +278,7 @@ package org.bigbluebutton.lib.user.models {
 			if (p) {
 				var user:User = p.participant as User;
 				p.participant.raiseHand = value;
-				userChangeSignal.dispatch(p.participant, RAISE_HAND);
+				userChangeSignal.dispatch(p.participant, RAISE_HAND, null);
 			}
 		}
 		
@@ -285,7 +291,7 @@ package org.bigbluebutton.lib.user.models {
 				user.muted = muted;
 				user.talking = talking;
 				user.locked = locked;
-				userChangeSignal.dispatch(user, JOIN_AUDIO);
+				userChangeSignal.dispatch(user, JOIN_AUDIO, null);
 			} else {
 				trace("UserList: User join audio failed - user not found");
 			}
@@ -296,7 +302,7 @@ package org.bigbluebutton.lib.user.models {
 			if (user != null) {
 				user.talking = false;
 				user.voiceJoined = false;
-				userChangeSignal.dispatch(user, JOIN_AUDIO);
+				userChangeSignal.dispatch(user, JOIN_AUDIO, null);
 			} else {
 				trace("UserList: User leave audio failed - user not found");
 			}
@@ -309,7 +315,7 @@ package org.bigbluebutton.lib.user.models {
 				if (mute) {
 					user.talking = false;
 				}
-				userChangeSignal.dispatch(user, MUTE);
+				userChangeSignal.dispatch(user, MUTE, null);
 			}
 		}
 		
@@ -317,7 +323,7 @@ package org.bigbluebutton.lib.user.models {
 			var user:User = getUserByVoiceUserId(voiceUserID);
 			if (user != null) {
 				user.locked = locked;
-				userChangeSignal.dispatch(user, LOCKED);
+				userChangeSignal.dispatch(user, LOCKED, null);
 			}
 		}
 		
@@ -349,7 +355,7 @@ package org.bigbluebutton.lib.user.models {
 			var user:User = getUser(userID);
 			if (user != null) {
 				user.listenOnly = listenOnly;
-				userChangeSignal.dispatch(user, LISTEN_ONLY);
+				userChangeSignal.dispatch(user, LISTEN_ONLY, null);
 			}
 		}
 	}
