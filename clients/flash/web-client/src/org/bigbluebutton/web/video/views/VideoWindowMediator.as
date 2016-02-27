@@ -48,7 +48,9 @@ package org.bigbluebutton.web.video.views {
 		}
 		
 		private function closeAllWebcams():void {
-		
+			for each (var video:Object in videos) {
+				stopStream(null, video.streamName);
+			}
 		}
 		
 		private function videoProfilesLoadedHandler():void {
@@ -63,8 +65,12 @@ package org.bigbluebutton.web.video.views {
 			}
 		}
 		
-		private function userRemovedHandler(userID:String):void {
-			// check for stream(s) and remove
+		private function userRemovedHandler(userId:String):void {
+			var videosByUserId:Array = findVideosByUserId(userId);
+			
+			for each (var video:Object in videosByUserId) {
+				stopStream(null, video.streamName);
+			}
 		}
 		
 		private function userChangeHandler(user:User, type:int, streamName:Object):void {
@@ -93,9 +99,13 @@ package org.bigbluebutton.web.video.views {
 		private function stopStream(user:User, streamName:String):void {
 			var video:WebcamView = findVideoByStreamName(streamName);
 			if (video != null) {
+				videos.removeItem(video);
 				view.removeVideo(video);
 				video.close();
-				user.removeViewingStream(streamName);
+				
+				if (user != null) {
+					user.removeViewingStream(streamName);
+				}
 			}
 		}
 		
@@ -109,7 +119,14 @@ package org.bigbluebutton.web.video.views {
 		}
 		
 		private function findVideosByUserId(userId:String):Array {
-			return null;
+			var returnedArray:Array = new Array();
+			
+			for each (var video:Object in videos) {
+				if ((video as WebcamView).userID == userId) {
+					returnedArray.push(video);
+				}
+			}
+			return returnedArray;
 		}
 		
 		override public function destroy():void {
