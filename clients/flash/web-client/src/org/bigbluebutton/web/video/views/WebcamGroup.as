@@ -38,13 +38,13 @@ package org.bigbluebutton.web.video.views {
 			var bestConfiguration:Object = findBestConfiguration(unscaledWidth, unscaledHeight, numChildren);
 			var numColumns:int = bestConfiguration.numColumns;
 			var numRows:int = bestConfiguration.numRows;
-			var cellWidth:int = bestConfiguration.width;
-			var cellHeight:int = bestConfiguration.height;
+			var cellWidth:Number = bestConfiguration.width;
+			var cellHeight:Number = bestConfiguration.height;
 			var cellAspectRatio:Number = bestConfiguration.cellAspectRatio;
 			
-			var blockX:int = Math.floor((unscaledWidth - cellWidth * numColumns) / 2);
-			var blockY:int = Math.floor((unscaledHeight - cellHeight * numRows) / 2);
-			var itemX:int, itemY:int, itemWidth:int, itemHeight:int;
+			var blockX:int = ((unscaledWidth - cellWidth * numColumns) / 2);
+			var blockY:int = ((unscaledHeight - cellHeight * numRows) / 2);
+			var itemX:Number, itemY:Number, itemWidth:Number, itemHeight:Number;
 			
 			for (var i:int = 0; i < numChildren; ++i) {
 				var item:WebcamView = getChildAt(i) as WebcamView;
@@ -52,10 +52,10 @@ package org.bigbluebutton.web.video.views {
 				var cellOffsetY:int = 0;
 				if (item.videoProfile.aspectRatio > cellAspectRatio) {
 					itemWidth = cellWidth;
-					itemHeight = Math.floor(cellWidth / item.videoProfile.aspectRatio);
+					itemHeight = (cellWidth / item.videoProfile.aspectRatio);
 					cellOffsetY = (cellHeight - itemHeight) / 2;
 				} else {
-					itemWidth = Math.floor(cellHeight * item.videoProfile.aspectRatio);
+					itemWidth = (cellHeight * item.videoProfile.aspectRatio);
 					itemHeight = cellHeight;
 					cellOffsetX = (cellWidth - itemWidth) / 2;
 				}
@@ -77,6 +77,7 @@ package org.bigbluebutton.web.video.views {
 					bestConfiguration = currentConfiguration;
 				}
 			}
+			
 			return bestConfiguration;
 		}
 		
@@ -90,11 +91,11 @@ package org.bigbluebutton.web.video.views {
 		}
 		
 		private function calculateCellDimensions(canvasWidth:int, canvasHeight:int, numColumns:int, numRows:int):Object {
-			var obj:Object = {width: Math.floor(canvasWidth / numColumns) - HORIZONTAL_PADDING, height: Math.floor(canvasHeight / numRows) - VERTICAL_PADDING}
+			var obj:Object = {width: (canvasWidth / numColumns) - HORIZONTAL_PADDING, height: (canvasHeight / numRows) - VERTICAL_PADDING}
 			if (obj.width / obj.height > _minContentAspectRatio) {
-				obj.width = Math.floor(obj.height * _minContentAspectRatio);
+				obj.width = (obj.height * _minContentAspectRatio);
 			} else {
-				obj.height = Math.floor(obj.width / _minContentAspectRatio);
+				obj.height = (obj.width / _minContentAspectRatio);
 			}
 			return obj;
 		}
