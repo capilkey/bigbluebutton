@@ -12,7 +12,7 @@ s|Button {
 	alpha: 1;
 }
 
-s|Button {
+s|Button:disabled {
 	skinClass: ClassReference("org.bigbluebutton.web.common.skins.BetterButtonSkin");
 	alpha: 0.5;
 }
@@ -91,6 +91,14 @@ s|RichEditableText.msgTextStyle {
 
 .mediaKickStyle {
 	icon: Embed(source="assets/images/eject_user.png");
+}
+
+.webcamCloseButtonStyle {
+	borderAlpha: 0;
+	backgroundAlpha: 0;
+	highlightAlpha: 0;
+	lowlightAlpha: 0;
+	icon: Embed(source="assets/images/close_white.png");
 }
 
 .contentFontSize {
