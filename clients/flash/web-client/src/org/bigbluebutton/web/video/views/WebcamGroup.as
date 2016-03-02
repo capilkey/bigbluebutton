@@ -10,6 +10,10 @@ package org.bigbluebutton.web.video.views {
 		
 		public function WebcamGroup() {
 			super();
+			
+			// Need to explicitly set the min width/height or the sizing will break when a webcam is removed
+			minWidth = 50;
+			minHeight = 50;
 		}
 		
 		public function addVideo(v:WebcamView):void {

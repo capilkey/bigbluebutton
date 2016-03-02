@@ -1,4 +1,6 @@
 package org.bigbluebutton.web.video.views {
+	import flash.events.Event;
+	
 	import mx.collections.ArrayCollection;
 	
 	import org.bigbluebutton.lib.main.models.IUserSession;
@@ -75,7 +77,6 @@ package org.bigbluebutton.web.video.views {
 		
 		private function userChangeHandler(user:User, type:int, streamName:Object):void {
 			if (type == UserList.START_STREAM) {
-				trace("name: " + user.name + ", hasStream: " + user.hasStream + ", streamName: " + streamName);
 				startStream(user, streamName as String);
 			} else if (type == UserList.STOP_STREAM) {
 				stopStream(user, streamName as String);
@@ -84,15 +85,14 @@ package org.bigbluebutton.web.video.views {
 		
 		private function startStream(user:User, streamName:String):void {
 			if (findVideoByStreamName(streamName) == null) {
-				for (var i:int = 0; i < 10; i++) {
-					var newWebcam:WebcamView = new WebcamView();
-					newWebcam.videoProfile = videoProfileManager.getVideoProfileByStreamName(streamName);
-					newWebcam.startStream(userSession.videoConnection.connection, user.name, streamName, user.userID);
-					
-					videos.addItem(newWebcam);
-					view.addVideo(newWebcam);
-					user.addViewingStream(streamName);
-				}
+				var newWebcam:WebcamView = new WebcamView();
+				newWebcam.closeSignal.add(handleWebcamCloseRequested);
+				newWebcam.videoProfile = videoProfileManager.getVideoProfileByStreamName(streamName);
+				newWebcam.startStream(userSession.videoConnection.connection, user.name, streamName, user.userID);
+				
+				videos.addItem(newWebcam);
+				view.addVideo(newWebcam);
+				user.addViewingStream(streamName);
 			}
 		}
 		
@@ -106,6 +106,13 @@ package org.bigbluebutton.web.video.views {
 				if (user != null) {
 					user.removeViewingStream(streamName);
 				}
+			}
+		}
+		
+		private function handleWebcamCloseRequested(userId:String, streamName:String):void {
+			var user:User = userSession.userList.getUserByUserId(userId);
+			if (user) {
+				stopStream(user, streamName);
 			}
 		}
 		

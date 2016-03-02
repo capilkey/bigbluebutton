@@ -1,5 +1,6 @@
 package org.bigbluebutton.web.video.views {
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.net.NetConnection;
 	
 	import mx.controls.Label;
@@ -7,6 +8,7 @@ package org.bigbluebutton.web.video.views {
 	
 	import org.bigbluebutton.lib.common.views.VideoView;
 	import org.bigbluebutton.lib.video.models.VideoProfile;
+	import org.osflash.signals.Signal;
 	
 	import spark.components.Button;
 	
@@ -22,6 +24,12 @@ package org.bigbluebutton.web.video.views {
 		
 		private var overlayBackground:UIComponent;
 		
+		private var _closeSignal:Signal;
+		
+		public function get closeSignal():Signal {
+			return _closeSignal;
+		}
+		
 		public function WebcamView() {
 			super();
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
@@ -29,6 +37,8 @@ package org.bigbluebutton.web.video.views {
 			
 			width = 100;
 			height = 100;
+			
+			_closeSignal = new Signal();
 			
 			overlayBackground = new UIComponent();
 			overlayBackground.height = OVERLAY_HEIGHT;
@@ -43,7 +53,9 @@ package org.bigbluebutton.web.video.views {
 			closeBtn = new Button();
 			closeBtn.height = OVERLAY_HEIGHT;
 			closeBtn.width = OVERLAY_HEIGHT;
+			closeBtn.buttonMode = true;
 			closeBtn.styleName = "webcamCloseButtonStyle";
+			closeBtn.addEventListener(MouseEvent.CLICK, onCloseClick);
 			addChild(closeBtn);
 		}
 		
@@ -107,8 +119,13 @@ package org.bigbluebutton.web.video.views {
 			nameLabel.width = width - padding * 3 - closeBtn.width;
 		}
 		
+		private function onCloseClick(e:MouseEvent):void {
+			_closeSignal.dispatch(userID, streamName);
+		}
+		
 		public override function close():void {
 			removeEventListener(Event.RESIZE, onResize);
+			closeBtn.removeEventListener(MouseEvent.CLICK, onCloseClick);
 			super.close();
 		}
 	}
