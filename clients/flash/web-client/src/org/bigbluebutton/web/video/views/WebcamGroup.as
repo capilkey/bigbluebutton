@@ -8,22 +8,24 @@ package org.bigbluebutton.web.video.views {
 		
 		private var _minContentAspectRatio:Number = 4 / 3;
 		
-		private var _numVideos:Number = 0;;
+		private var _numVideos:Number = 0;
+		
+		public function get numVideos():Number {
+			return _numVideos;
+		}
 		
 		public function WebcamGroup() {
 			super();
 			
 			// Need to explicitly set the min width/height or the sizing will break when a webcam is removed
-			minWidth = 50;
-			minHeight = 50;
+			//minWidth = 50;
+			//minHeight = 50;
 		}
 		
 		public function addVideo(v:WebcamView):void {
 			var count:uint = this.numElements;
 			addElement(v);
 			if (count < this.numElements) _numVideos++;
-			
-			validateHeight();
 			
 			_minContentAspectRatio = minContentAspectRatio();
 			invalidateDisplayList();
@@ -34,15 +36,8 @@ package org.bigbluebutton.web.video.views {
 			removeElement(v);
 			if (count > this.numElements) _numVideos--;
 			
-			validateHeight();
-			
 			_minContentAspectRatio = minContentAspectRatio();
 			invalidateDisplayList();
-		}
-		
-		private function validateHeight():void {
-			if (_numVideos > 0) height = 200;
-			else height = 0;
 		}
 		
 		override protected function updateDisplayList(w:Number, h:Number):void {
