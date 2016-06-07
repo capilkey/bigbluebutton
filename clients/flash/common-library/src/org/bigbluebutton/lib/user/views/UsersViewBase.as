@@ -37,6 +37,7 @@ package org.bigbluebutton.lib.user.views
 			
 			var listLayout:VerticalLayout = new VerticalLayout();
 			listLayout.requestedRowCount = -1;
+			listLayout.gap = 0;
 			_userList.layout = listLayout;
 			
 			addElement(_userList);

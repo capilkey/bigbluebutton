@@ -38,16 +38,16 @@
 					
 					if (obj.voiceJoined) {
 						if (obj.muted) {
-							audioIcon.styleName = "iconStyle micOffIconStyle";
+							audioIcon.text = "\ue91c";
 						} else if (obj.talking) {
-							audioIcon.styleName = "iconStyle speakingMicIconStyle";
+							//audioIcon.styleName = "iconStyle speakingMicIconStyle";
 						} else {
-							audioIcon.styleName = "iconStyle micIconStyle";
+							audioIcon.text = "\ue91b";
 						}
 					} else if (obj.listenOnly) {
-						audioIcon.styleName = "iconStyle listenOnlyIconStyle";
+						audioIcon.text = "\ue90d";
 					} else {
-						audioIcon.styleName = "iconStyle";
+						audioIcon.text = "";
 					}
 					
 					lockIcon.visible = obj.locked;
@@ -73,7 +73,7 @@
 	<s:Group width="100%"
 			 height="{getStyle('itemHeight')}">
 		<s:layout>
-			<s:HorizontalLayout verticalAlign="middle" />
+			<s:HorizontalLayout verticalAlign="middle" gap="2" />
 		</s:layout>
 
 		<common:ParticipantIcon id="participantIcon" />
@@ -87,11 +87,19 @@
 			<s:Label id="subLabelDisplay"
 					 styleName="participantStatusStyle" />
 		</s:Group>
-		<s:Image id="cameraIcon"
-				 styleName="iconStyle cameraIconStyle" />
-		<s:Image id="audioIcon"
-				 styleName="iconStyle micIconStyle" />
-		<s:Image id="lockIcon"
-				 styleName="iconStyle lockIconStyle" />
+		<s:Label id="cameraIcon"
+				 width="32"
+				 height="32"
+				 text="&#x1f554;"
+				 styleName="userListIconStyle" />
+		<s:Label id="audioIcon"
+				 width="30"
+				 height="30"
+				 styleName="userListIconStyle" />
+		<s:Label id="lockIcon"
+				 width="30"
+				 height="30"
+				 text="&#xe912;"
+				 styleName="userListIconStyle" />
 	</s:Group>
 </s:ItemRenderer>

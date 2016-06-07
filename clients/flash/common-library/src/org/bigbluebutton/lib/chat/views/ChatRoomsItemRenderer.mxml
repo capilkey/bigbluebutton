@@ -14,12 +14,12 @@
 				if (obj) {
 					title.text = obj.userName;
 					if (obj.isPublic == true) {
-						publicChatIcon.visible = publicChatIcon.includeInLayout = true;
-						participantIcon.visible = participantIcon.includeInLayout = false;
+						publicChatIcon.visible = true;
+						participantIcon.visible =  false;
 					} else {
 						participantIcon.setFirstLetters(obj.userName);
-						participantIcon.visible = participantIcon.includeInLayout = true;
-						publicChatIcon.visible = publicChatIcon.includeInLayout = false;
+						participantIcon.visible = true;
+						publicChatIcon.visible = false;
 					}
 					/*
 					   if (obj.online == false) {
@@ -38,13 +38,14 @@
 			<s:HorizontalLayout verticalAlign="middle"
 								horizontalAlign="center" />
 		</s:layout>
-		<s:Image id="publicChatIcon"
-				 visible="false"
-				 includeInLayout="false"
-				 styleName="iconStyle publicChatIconStyle" />
-		<common:ParticipantIcon id="participantIcon"
-								visible="false"
-								includeInLayout="false" />
+		<s:Group>
+			<s:Label id="publicChatIcon"
+					 visible="false"
+					 text="&#xe911;"
+					 styleName="userListIconStyle" />
+			<common:ParticipantIcon id="participantIcon"
+									visible="false" />
+		</s:Group>
 		<s:Label id="title"
 				 width="100%"
 				 styleName="contentFontSize" />

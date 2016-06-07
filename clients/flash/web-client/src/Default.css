@@ -43,6 +43,14 @@
 	embedAsCFF:	false;
 }
 
+@font-face {
+	src: 		url("../../common-library/src/assets/fonts/bbb-icons/bbb-icons.ttf"); 
+	fontFamily:	BBBIcons; 
+	fontStyle:	normal; 
+	fontWeight:	normal; 
+	embedAsCFF:	true;
+}
+
 global
 {
 	font-family:	SourceSansPro;
@@ -50,7 +58,7 @@ global
 
 s|Application
 {
-	backgroundColor: #2A2D33;	
+	backgroundColor: PropertyReference("bbbBlack");	
 }
 
 mx|MenuItemRenderer
@@ -60,18 +68,18 @@ mx|MenuItemRenderer
 
 libChat|NewMessagesIndicator
 {
-	backgroundColor: 	#F0615F;
+	backgroundColor: 	PropertyReference("bbbRed");
 	backgroundAlpha:	1;
-	backgroundColor: 	#F0615F;
+	backgroundColor: 	PropertyReference("bbbRed");
 	borderAlpha: 		0;
-	color:				#F3F6F9;
+	color:				PropertyReference("bbbWhite");
 	cornerRadius:		6;
 	skinClass:			ClassReference("org.bigbluebutton.lib.chat.views.skins.NewMessagesIndicatorSkin");
 }
 
 .titleLabelStyle
 {
-	color: 		#F3F6F9;
+	color: 		PropertyReference("bbbWhite");
 	fontSize:	24;
 }
 
@@ -99,9 +107,9 @@ libChat|NewMessagesIndicator
 
 .menuButtonStyle
 {
-	backgroundColor         : #299AD5;
-	selectedBackgroundColor : #8A9AA7;
-	color                   : #F3F6F9;
+	backgroundColor         : PropertyReference("bbbBlue");
+	selectedBackgroundColor : PropertyReference("bbbGrey");
+	color                   : PropertyReference("bbbWhite");
 	fontSize				: 14;
 	skinClass               : ClassReference("org.bigbluebutton.lib.main.views.skins.MenuButtonSkin");
 }
@@ -133,7 +141,7 @@ libChat|NewMessagesIndicator
 
 .participantIconStyle
 {
-	circleColor : #8898A5;
+	circleColor : PropertyReference("bbbGrey");
 	width  : 32;
 	height : 32;
 	fontSize : 12;
@@ -148,12 +156,12 @@ libChat|NewMessagesIndicator
 .contentStyle
 {
 	fontSize:	14;
-	color:		#8B9AA8;
+	color:		PropertyReference("bbbGrey");
 }
 
 .panelStyle
 {
-	backgroundColor:	#F3F6F9;
+	backgroundColor:	PropertyReference("bbbWhite");
 	backgroundAlpha:	1;
 	padding:			6;
 	skinClass:			ClassReference("org.bigbluebutton.web.common.skins.PanelSkin");
@@ -163,43 +171,14 @@ libChat|NewMessagesIndicator
 {
 	fontSize:		18;
 	fontWeight:		bold;
-	color:			#2A2D33;
+	color:			PropertyReference("bbbBlack");
 	paddingBottom:	10;
 }
 
-.iconStyle
+.userListIconStyle
 {
-	width:		32;
-	height:		32;
-	skinClass:	ClassReference("org.bigbluebutton.lib.common.skins.IconSkin")
-}
-
-.cameraIconStyle
-{
-	backgroundImage : Embed(source="../../air-client/src/assets/res/drawable-mdpi/video.png");
-}
-
-.micIconStyle
-{
-	backgroundImage : Embed(source="../../air-client/src/assets/res/drawable-mdpi/microphone.png");
-}
-
-.micOffIconStyle
-{
-	backgroundImage : Embed(source="../../air-client/src/assets/res/drawable-mdpi/micOffIcon_dark.png");
-}
-
-.speakingMicIconStyle
-{
-	backgroundImage : Embed(source="../../air-client/src/assets/res/drawable-mdpi/microphone_talk.png");
-}
-
-.listenOnlyIconStyle
-{
-	backgroundImage : Embed(source="../../air-client/src/assets/res/drawable-mdpi/ic_headset.png");
-}
-
-.lockIconStyle
-{
-	backgroundImage : Embed(source="../../air-client/src/assets/res/drawable-mdpi/lock.png");
+	fontFamily:		BBBIcons;
+	fontSize:		22;
+	verticalAlign:	middle;
+	textAlign:		center;
 }

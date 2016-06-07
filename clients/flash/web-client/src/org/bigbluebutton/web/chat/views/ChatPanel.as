@@ -41,6 +41,8 @@ package org.bigbluebutton.web.chat.views {
 			
 			var g:HGroup = new HGroup();
 			g.percentWidth = 100;
+			g.height = 40;
+			g.verticalAlign = "middle";
 			
 			_title = new Label();
 			_title.percentWidth = 100;
@@ -49,7 +51,10 @@ package org.bigbluebutton.web.chat.views {
 			g.addElement(title);
 			
 			_closeButton = new Button();
-			_closeButton.label = "X";
+			_closeButton.width = 35;
+			_closeButton.height = 35;
+			_closeButton.label = "\ue913";
+			_closeButton.setStyle("fontFamily", "BBBIcons");
 			g.addElement(_closeButton);
 			
 			addElement(g);

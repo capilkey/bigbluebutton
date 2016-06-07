@@ -36,6 +36,7 @@ package org.bigbluebutton.lib.chat.views {
 			
 			var listLayout:VerticalLayout = new VerticalLayout();
 			listLayout.requestedRowCount = -1;
+			listLayout.gap = 0;
 			_chatRoomList.layout = listLayout;
 			
 			addElement(_chatRoomList);
