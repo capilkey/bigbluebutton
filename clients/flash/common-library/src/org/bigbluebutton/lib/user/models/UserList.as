@@ -109,44 +109,52 @@ package org.bigbluebutton.lib.user.models {
 			return null;
 		}
 		
-		/**
-		 * Custom sort function for the users ArrayCollection. Need to put dial-in users at the very bottom.
-		 */
+		// Custom sort function for the users ArrayCollection. Need to put dial-in users at the very bottom.
 		private function sortFunction(a:Object, b:Object, array:Array = null):int {
-			var au:User = a as User, bu:User = b as User;
 			/*if (a.presenter)
-			   return -1;
-			   else if (b.presenter)
-			   return 1;*/
-			if (au.role == User.MODERATOR && bu.role == User.MODERATOR) {
-				// do nothing go to the end and check names
-			} else if (au.role == User.MODERATOR)
+			return -1;
+			else if (b.presenter)
+			return 1;*/
+			if (a.role == User.MODERATOR && b.role == User.MODERATOR) {
+				if (a.hasEmojiStatus() && b.hasEmojiStatus()) {
+					if (a.statusTime < b.statusTime)
+						return -1;
+					else
+						return 1;
+				} else if (a.hasEmojiStatus())
+					return -1;
+				else if (b.hasEmojiStatus())
+					return 1;
+			} else if (a.role == User.MODERATOR)
 				return -1;
-			else if (bu.role == User.MODERATOR)
+			else if (b.role == User.MODERATOR)
 				return 1;
-			else if ((User.EMOJI_STATUSES.indexOf(au.status) > -1) && (User.EMOJI_STATUSES.indexOf(bu.status) > -1)) {
-				// do nothing go to the end and check names
-			} else if (User.EMOJI_STATUSES.indexOf(au.status) > -1)
+			else if (a.hasEmojiStatus() && b.hasEmojiStatus()) {
+				if (a.statusTime < b.statusTime)
+					return -1;
+				else
+					return 1;
+			} else if (a.hasEmojiStatus())
 				return -1;
-			else if (User.EMOJI_STATUSES.indexOf(au.status) > -1)
+			else if (b.hasEmojiStatus())
 				return 1;
-			else if (au.phoneUser && bu.phoneUser) {
-			} else if (au.phoneUser)
+			else if (!a.phoneUser && !b.phoneUser) {
+			} else if (!a.phoneUser)
 				return -1;
-			else if (bu.phoneUser)
+			else if (!b.phoneUser)
 				return 1;
-			/**
-			 * Check name (case-insensitive) in the event of a tie up above. If the name
-			 * is the same then use userID which should be unique making the order the same
-			 * across all clients.
-			 */
-			if (au.name.toLowerCase() < bu.name.toLowerCase())
+			/*
+			* Check name (case-insensitive) in the event of a tie up above. If the name
+			* is the same then use userID which should be unique making the order the same
+			* across all clients.
+			*/
+			if (a.name.toLowerCase() < b.name.toLowerCase())
 				return -1;
-			else if (au.name.toLowerCase() > bu.name.toLowerCase())
+			else if (a.name.toLowerCase() > b.name.toLowerCase())
 				return 1;
-			else if (au.userId.toLowerCase() > bu.userId.toLowerCase())
+			else if (a.userId.toLowerCase() > b.userId.toLowerCase())
 				return -1;
-			else if (au.userId.toLowerCase() < bu.userId.toLowerCase())
+			else if (a.userId.toLowerCase() < b.userId.toLowerCase())
 				return 1;
 			return 0;
 		}
@@ -239,6 +247,7 @@ package org.bigbluebutton.lib.user.models {
 				userChangeSignal.dispatch(u, PRESENTER);
 				if (u.me)
 					_me.presenter = false;
+				_users.refresh();
 			}
 		}
 		
@@ -251,6 +260,7 @@ package org.bigbluebutton.lib.user.models {
 				userChangeSignal.dispatch(user, PRESENTER);
 				if (user.me)
 					_me.presenter = true;
+				_users.refresh();
 			}
 		}
 		
@@ -259,6 +269,7 @@ package org.bigbluebutton.lib.user.models {
 				user.presenter = false;
 				userChangeSignal.dispatch(user, PRESENTER);
 			}
+			_users.refresh();
 		}
 		
 		public function userStreamChange(userID:String, share:Boolean, streamName:String):void {
@@ -303,6 +314,7 @@ package org.bigbluebutton.lib.user.models {
 				var user:User = p.participant as User;
 				p.participant.status = value;
 				userChangeSignal.dispatch(p.participant, STATUS);
+				_users.refresh();
 			}
 		}
 		

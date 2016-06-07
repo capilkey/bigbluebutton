@@ -26,8 +26,6 @@ package org.bigbluebutton.lib.user.models {
 		
 		public static const AWAY:String = "away";
 		
-		public static const EMOJI_STATUSES:Array = [RAISE_HAND, HAPPY, SMILE, NEUTRAL, SAD, CONFUSED, AWAY];
-		
 		
 		/**
 		 * Flag to tell that user is in the process of leaving the meeting.
@@ -95,6 +93,7 @@ package org.bigbluebutton.lib.user.models {
 			verifyUserStatus();
 		}
 		
+		public var statusTime:Date;
 		private var _status:String = User.NO_STATUS;
 		
 		public function get status():String {
@@ -103,7 +102,12 @@ package org.bigbluebutton.lib.user.models {
 		
 		public function set status(s:String):void {
 			_status = s;
+			statusTime = new Date();
 			verifyUserStatus();
+		}
+		
+		public function hasEmojiStatus():Boolean {
+			return _status != NO_STATUS;
 		}
 		
 		private var _hasStream:Boolean = false;

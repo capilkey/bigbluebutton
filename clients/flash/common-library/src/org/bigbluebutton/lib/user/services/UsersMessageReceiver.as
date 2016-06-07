@@ -180,7 +180,7 @@ package org.bigbluebutton.lib.user.services {
 			user.isLeavingFlag = false;
 			user.listenOnly = newUser.listenOnly;
 			user.muted = newUser.voiceUser.muted;
-			user.status = newUser.status;
+			user.status = newUser.emojiStatus;
 			userSession.userList.addUser(user);
 		}
 		
