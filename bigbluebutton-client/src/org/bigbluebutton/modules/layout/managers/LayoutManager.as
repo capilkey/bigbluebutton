@@ -321,20 +321,25 @@ package org.bigbluebutton.modules.layout.managers
 		}
 		
 		private function applyLayout(layout:LayoutDefinition):void {
-			LOGGER.debug("applyLayout");
-			detectContainerChange = false;
-
-			if (layout != null) {
-				layout.applyToCanvas(_canvas, function():void {
-					LOGGER.debug("layout applied successfully, resetting detectContainerChange");
+			// Firefox has started setting the height to negative values when the tab loses focus. Adding a 
+			// check for invalid height and width values avoid an unnecessary resize.
+			if (_canvas.width > 0 && _canvas.height > 0) {
+				
+				LOGGER.debug("applyLayout");
+				detectContainerChange = false;
+				
+				if (layout != null) {
+					layout.applyToCanvas(_canvas, function():void {
+						LOGGER.debug("layout applied successfully, resetting detectContainerChange");
+						detectContainerChange = true;
+					});
+					dispatchSwitchedLayoutEvent(layout.name);
+					LiveMeeting.inst().sharedNotes.numAdditionalSharedNotes = layout.numAdditionalSharedNotes;
+				} else {
 					detectContainerChange = true;
-				});
-				dispatchSwitchedLayoutEvent(layout.name);
-				LiveMeeting.inst().sharedNotes.numAdditionalSharedNotes = layout.numAdditionalSharedNotes;
-			} else {
-				detectContainerChange = true;
+				}
+				updateCurrentLayout(layout);
 			}
-			updateCurrentLayout(layout);
 		}
 
     private function set detectContainerChange(detect:Boolean):void {
