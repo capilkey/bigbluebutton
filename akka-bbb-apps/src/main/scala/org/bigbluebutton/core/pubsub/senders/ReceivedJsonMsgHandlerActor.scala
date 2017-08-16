@@ -45,7 +45,7 @@ class ReceivedJsonMsgHandlerActor(
 
   def handle(envelope: BbbCoreEnvelope, jsonNode: JsonNode): Unit = {
     // if (SendCursorPositionPubMsg.NAME != envelope.name)
-    //   log.debug("Route envelope name " + envelope.name)
+    log.debug("Route envelope name " + envelope.name)
 
     envelope.name match {
       // System

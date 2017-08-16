@@ -163,10 +163,7 @@ class MeetingActor(
     case msg: BreakoutRoomEndedInternalMsg =>
       state = handleBreakoutRoomEndedInternalMsg(msg, state)
 
-    // Screenshare
-    case msg: DeskShareGetDeskShareInfoRequest => handleDeskShareGetDeskShareInfoRequest(msg)
-
-    case _                                     => // do nothing
+    case _ => // do nothing
   }
 
   private def handleBbbCommonEnvCoreMsg(msg: BbbCommonEnvCoreMsg): Unit = {
@@ -327,21 +324,6 @@ class MeetingActor(
       liveMeeting.props.screenshareProps.screenshareConf
     )
 
-  }
-
-  def handleDeskShareGetDeskShareInfoRequest(msg: DeskShareGetDeskShareInfoRequest): Unit = {
-
-    log.info("handleDeskShareGetDeskShareInfoRequest: " + msg.conferenceName + "isBroadcasting="
-      + ScreenshareModel.isBroadcastingRTMP(liveMeeting.screenshareModel) + " URL:" +
-      ScreenshareModel.getRTMPBroadcastingUrl(liveMeeting.screenshareModel))
-
-    if (ScreenshareModel.isBroadcastingRTMP(liveMeeting.screenshareModel)) {
-      // if the meeting has an ongoing WebRTC Deskshare session, send a notification
-      //outGW.send(new DeskShareNotifyASingleViewer(props.meetingProp.intId, msg.requesterID,
-      //  DeskshareModel.getRTMPBroadcastingUrl(liveMeeting.deskshareModel),
-      //  DeskshareModel.getDesktopShareVideoWidth(liveMeeting.deskshareModel),
-      //  DeskshareModel.getDesktopShareVideoHeight(liveMeeting.deskshareModel), true))
-    }
   }
 
   def handleMonitorNumberOfUsers(msg: MonitorNumberOfUsersInternalMsg) {

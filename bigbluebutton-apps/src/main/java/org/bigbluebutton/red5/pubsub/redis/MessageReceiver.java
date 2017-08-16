@@ -3,8 +3,6 @@ package org.bigbluebutton.red5.pubsub.redis;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import org.bigbluebutton.common.messages.MessagingConstants;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -39,7 +37,7 @@ public class MessageReceiver {
 			    	if (receiveMessage) {
 			    		try {
 			    			jedis.psubscribe(new PubSubListener(),
-				    				MessagingConstants.FROM_BBB_APPS_PATTERN);
+			    					"bigbluebutton:from-bbb-apps:*");
 			    		} catch(JedisConnectionException ex) {
 			    			//log.warn("Exception on Jedis connection. Resubscribing to pubsub.");
 			    			start();

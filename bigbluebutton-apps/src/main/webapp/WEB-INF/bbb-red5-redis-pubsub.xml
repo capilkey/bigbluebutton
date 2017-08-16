@@ -48,11 +48,6 @@ with BigBlueButton; if not, see <http://www.gnu.org/licenses/>.
 
     <bean id="red5RedisDistributor" class="org.bigbluebutton.red5.pubsub.redis.MessageDistributor">
        <property name="messageHandler"> <ref local="red5RedisHandler"/> </property>
-       <property name="messageListeners">
-          <set>
-              <ref bean="redisPubSubMessageHandler" />             
-          </set>
-      </property>
     </bean>
 
 </beans>

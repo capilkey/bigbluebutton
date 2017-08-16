@@ -56,8 +56,6 @@ import org.bigbluebutton.api.messaging.messages.UserSharedWebcam;
 import org.bigbluebutton.api.messaging.messages.UserStatusChanged;
 import org.bigbluebutton.api.messaging.messages.UserUnsharedWebcam;
 import org.bigbluebutton.api2.IBbbWebApiGWApp;
-import org.bigbluebutton.common.messages.Constants;
-import org.bigbluebutton.common.messages.SendStunTurnInfoReplyMessage;
 import org.bigbluebutton.presentation.PresentationUrlDownloadService;
 import org.bigbluebutton.api.messaging.messages.StunTurnInfoRequested;
 import org.bigbluebutton.web.services.RegisteredUserCleanupTimerTask;
@@ -711,7 +709,8 @@ public class MeetingService implements MessageListener {
   }
 
   private void processStunTurnInfoRequested(StunTurnInfoRequested message) {
-    Set<StunServer> stuns = stunTurnService.getStunServers();
+    /*
+	Set<StunServer> stuns = stunTurnService.getStunServers();
     log.info("\nhere are the stuns:");
     for (StunServer s : stuns) {
       log.info("a stun: " + s.url);
@@ -740,18 +739,19 @@ public class MeetingService implements MessageListener {
       TurnEntry te = (TurnEntry) turnsIter.next();
       if (null != te) {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put(Constants.USERNAME, te.username);
-        map.put(Constants.URL, te.url);
-        map.put(Constants.TTL, te.ttl);
-        map.put(Constants.PASSWORD, te.password);
+        map.put("username", te.username);
+        map.put("url", te.url);
+        map.put("ttl", te.ttl);
+        map.put("password", te.password);
 
         turnsArrayList.add(map);
       }
     }
+    */
 
-    SendStunTurnInfoReplyMessage msg = new SendStunTurnInfoReplyMessage(message.meetingId,
-      message.internalUserId,stunsArrayList, turnsArrayList);
-    gw.sendStunTurnInfoReply(msg);
+    //SendStunTurnInfoReplyMessage msg = new SendStunTurnInfoReplyMessage(message.meetingId,
+    //  message.internalUserId,stunsArrayList, turnsArrayList);
+    //gw.sendStunTurnInfoReply(msg);
   }
 
   public void userJoinedVoice(UserJoinedVoice message) {
