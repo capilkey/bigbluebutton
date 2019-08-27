@@ -62,21 +62,21 @@ export default injectIntl(withTracker(({ intl }) => {
 
     messages = ChatService.getPublicGroupMessages();
 
-    const time = currentUser.loginTime;
-    const welcomeId = `welcome-msg-${time}`;
+    const { loginTime } = currentUser;
+    const welcomeId = `welcome-msg-${loginTime}`;
 
     const welcomeMsg = {
       id: welcomeId,
       content: [{
         id: welcomeId,
         text: welcomeProp.welcomeMsg,
-        time,
+        time: loginTime,
       }],
-      time,
-      sender: null,
+      timestamp: loginTime,
+      senderId: null,
     };
 
-    const moderatorTime = time + 1;
+    const moderatorTime = loginTime + 1;
     const moderatorId = `moderator-msg-${moderatorTime}`;
 
     const moderatorMsg = {
@@ -86,15 +86,15 @@ export default injectIntl(withTracker(({ intl }) => {
         text: welcomeProp.modOnlyMessage,
         time: moderatorTime,
       }],
-      time: moderatorTime,
-      sender: null,
+      timestamp: moderatorTime,
+      senderId: null,
     };
 
-    const messagesBeforeWelcomeMsg = ChatService.reduceAndMapGroupMessages(
-      messages.filter(message => message.timestamp < time),
+    const messagesBeforeWelcomeMsg = ChatService.reduceGroupMessages(
+      messages.filter(message => message.timestamp < loginTime),
     );
-    const messagesAfterWelcomeMsg = ChatService.reduceAndMapGroupMessages(
-      messages.filter(message => message.timestamp >= time),
+    const messagesAfterWelcomeMsg = ChatService.reduceGroupMessages(
+      messages.filter(message => message.timestamp >= loginTime),
     );
 
     const messagesFormated = messagesBeforeWelcomeMsg
@@ -102,7 +102,7 @@ export default injectIntl(withTracker(({ intl }) => {
       .concat(currentUser.role === ROLE_MODERATOR ? moderatorMsg : [])
       .concat(messagesAfterWelcomeMsg);
 
-    messages = messagesFormated.sort((a, b) => (a.time - b.time));
+    messages = messagesFormated.sort((a, b) => (a.timestamp - b.timestamp));
   } else {
     messages = ChatService.getPrivateGroupMessages();
 
@@ -113,17 +113,17 @@ export default injectIntl(withTracker(({ intl }) => {
     partnerIsLoggedOut = receiverUser.connectionStatus !== CONNECTION_STATUS;
 
     if (partnerIsLoggedOut) {
-      const time = Date.now();
-      const id = `partner-disconnected-${time}`;
+      const timestamp = Date.now();
+      const id = `partner-disconnected-${timestamp}`;
       const messagePartnerLoggedOut = {
         id,
         content: [{
           id,
           text: 'partnerDisconnected',
-          time,
+          time: timestamp,
         }],
-        time,
-        sender: null,
+        timestamp,
+        senderId: null,
       };
 
       messages.push(messagePartnerLoggedOut);
@@ -132,7 +132,7 @@ export default injectIntl(withTracker(({ intl }) => {
   }
 
   messages = messages.map((message) => {
-    if (message.sender) return message;
+    if (message.senderId) return message;
 
     return {
       ...message,

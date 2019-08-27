@@ -27,8 +27,8 @@ const CLOSED_CHAT_LIST_KEY = 'closedChatList';
 const mapActiveChats = (chat) => {
   const currentUserId = Auth.userID;
 
-  if (chat.sender !== currentUserId) {
-    return chat.sender;
+  if (chat.senderId !== currentUserId) {
+    return chat.senderId;
   }
 
   const { chatId } = chat;

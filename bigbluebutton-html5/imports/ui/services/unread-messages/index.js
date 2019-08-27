@@ -37,7 +37,7 @@ class UnreadMessagesTracker {
       timestamp: {
         $gt: this.get(chatID),
       },
-      sender: { $ne: Auth.userID },
+      senderId: { $ne: Auth.userID },
     };
     if (chatID === PUBLIC_GROUP_CHAT_ID) {
       filter.chatId = { $eq: chatID };

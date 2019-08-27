@@ -14,6 +14,9 @@ const propTypes = {
   audioAlertDisabled: PropTypes.bool.isRequired,
   joinTimestamp: PropTypes.number.isRequired,
   idChatOpen: PropTypes.string.isRequired,
+  intl: PropTypes.shape({
+    formatMessage: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 const intlMessages = defineMessages({
@@ -83,7 +86,7 @@ class ChatAlert extends PureComponent {
         const thisChatUnreadMessages = UnreadMessages.getUnreadMessages(chatId);
 
         unalertedMessagesByChatId[chatId] = thisChatUnreadMessages.filter((msg) => {
-          const messageChatId = (msg.chatId === 'MAIN-PUBLIC-GROUP-CHAT') ? msg.chatId : msg.sender;
+          const messageChatId = (msg.chatId === 'MAIN-PUBLIC-GROUP-CHAT') ? msg.chatId : msg.senderId;
           const retorno = (msg
             && msg.timestamp > alertEnabledTimestamp
             && msg.timestamp > joinTimestamp
@@ -202,12 +205,12 @@ class ChatAlert extends PureComponent {
               .map((chatId) => {
                 // Only display the latest group of messages (up to 5 messages)
                 const reducedMessage = Service
-                  .reduceAndMapGroupMessages(pendingNotificationsByChat[chatId].slice(-5)).pop();
+                  .reduceGroupMessages(pendingNotificationsByChat[chatId].slice(-5)).pop();
 
-                if (!reducedMessage || !reducedMessage.sender) return null;
+                if (!reducedMessage || !reducedMessage.senderId) return null;
 
                 const content = this
-                  .createMessage(reducedMessage.sender.name, reducedMessage.content);
+                  .createMessage(reducedMessage.senderName, reducedMessage.content);
 
                 return (
                   <ChatPushAlert

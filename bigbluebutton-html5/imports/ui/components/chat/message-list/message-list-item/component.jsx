@@ -1,42 +1,34 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FormattedTime, defineMessages, injectIntl } from 'react-intl';
+import { FormattedTime } from 'react-intl';
 import _ from 'lodash';
 
-import UserAvatar from '/imports/ui/components/user-avatar/component';
 import Message from './message/component';
 
 import { styles } from './styles';
 
 const propTypes = {
-  user: PropTypes.shape({
-    color: PropTypes.string,
-    isModerator: PropTypes.bool,
-    isOnline: PropTypes.bool,
-    name: PropTypes.string,
-  }),
-  messages: PropTypes.arrayOf(Object).isRequired,
-  time: PropTypes.number.isRequired,
-  intl: PropTypes.shape({
-    formatMessage: PropTypes.func.isRequired,
+  message: PropTypes.shape({
+    senderId: PropTypes.string,
+    senderName: PropTypes.string,
+    content: PropTypes.arrayOf(Object).isRequired,
+    timestamp: PropTypes.number.isRequired,
   }).isRequired,
+  scrollArea: PropTypes.instanceOf(Element),
+  chatAreaId: PropTypes.string.isRequired,
+  handleReadMessage: PropTypes.func.isRequired,
+  lastReadMessageTime: PropTypes.number,
 };
 
 const defaultProps = {
-  user: null,
+  scrollArea: undefined,
+  lastReadMessageTime: 0,
 };
 
 const eventsToBeBound = [
   'scroll',
   'resize',
 ];
-
-const intlMessages = defineMessages({
-  offline: {
-    id: 'app.chat.offline',
-    description: 'Offline',
-  },
-});
 
 const isElementInViewport = (el) => {
   if (!el) return false;
@@ -70,12 +62,13 @@ class MessageListItem extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { messages, user } = this.props;
+    const { message } = this.props;
+    const { content, senderId } = message;
     const { pendingChanges } = this.state;
     if (pendingChanges) return;
 
-    const hasNewMessage = messages.length !== nextProps.messages.length;
-    const hasUserChanged = !_.isEqual(user, nextProps.user);
+    const hasNewMessage = content.length !== nextProps.message.content.length;
+    const hasUserChanged = senderId !== nextProps.message.senderId;
 
     this.setState({ pendingChanges: hasNewMessage || hasUserChanged });
   }
@@ -119,21 +112,21 @@ class MessageListItem extends Component {
 
   renderSystemMessage() {
     const {
-      messages,
+      message,
       chatAreaId,
       handleReadMessage,
     } = this.props;
 
     return (
-      <div className={styles.messages}>
-        {messages.map(message => (
-          message.text !== ''
+      <div>
+        {message.content.map(item => (
+          item.text !== ''
             ? (
               <Message
-                className={(message.id ? styles.systemMessage : null)}
+                className={(item.id ? styles.systemMessage : null)}
                 key={_.uniqueId('id-')}
-                text={message.text}
-                time={message.time}
+                text={item.text}
+                time={item.time}
                 chatAreaId={chatAreaId}
                 handleReadMessage={handleReadMessage}
               />
@@ -145,59 +138,47 @@ class MessageListItem extends Component {
 
   render() {
     const {
-      user,
-      messages,
-      time,
+      message,
       chatAreaId,
       lastReadMessageTime,
       handleReadMessage,
       scrollArea,
-      intl,
     } = this.props;
 
-    const dateTime = new Date(time);
+    const {
+      senderId,
+      senderName,
+      timestamp,
+      content,
+    } = message;
+
+    const dateTime = new Date(timestamp);
 
     const regEx = /<a[^>]+>/i;
 
-    if (!user) {
+    if (!senderId) {
       return this.renderSystemMessage();
     }
 
     return (
       <div className={styles.item}>
         <div className={styles.wrapper} ref={(ref) => { this.item = ref; }}>
-          <div className={styles.avatarWrapper}>
-            <UserAvatar
-              className={styles.avatar}
-              color={user.color}
-              moderator={user.isModerator}
-            >
-              {user.name.toLowerCase().slice(0, 2)}
-            </UserAvatar>
-          </div>
           <div className={styles.content}>
             <div className={styles.meta}>
-              <div className={user.isOnline ? styles.name : styles.logout}>
-                <span>{user.name}</span>
-                {user.isOnline
-                  ? null
-                  : (
-                    <span className={styles.offline}>
-                      {`(${intl.formatMessage(intlMessages.offline)})`}
-                    </span>
-                  )}
+              <div className={styles.name}>
+                <span>{senderName}</span>
               </div>
               <time className={styles.time} dateTime={dateTime}>
                 <FormattedTime value={dateTime} />
               </time>
             </div>
-            <div className={styles.messages}>
-              {messages.map(message => (
+            <div>
+              {content.map(item => (
                 <Message
-                  className={(regEx.test(message.text) ? styles.hyperlink : styles.message)}
-                  key={message.id}
-                  text={message.text}
-                  time={message.time}
+                  className={(regEx.test(item.text) ? styles.hyperlink : styles.message)}
+                  key={item.id}
+                  text={item.text}
+                  time={item.time}
                   chatAreaId={chatAreaId}
                   lastReadMessageTime={lastReadMessageTime}
                   handleReadMessage={handleReadMessage}
@@ -212,7 +193,7 @@ class MessageListItem extends Component {
   }
 }
 
-MessageListItem.propTypes = propTypes;
 MessageListItem.defaultProps = defaultProps;
+MessageListItem.propTypes = propTypes;
 
-export default injectIntl(MessageListItem);
+export default MessageListItem;

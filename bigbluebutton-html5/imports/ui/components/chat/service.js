@@ -21,8 +21,6 @@ const PUBLIC_CHAT_CLEAR = CHAT_CONFIG.system_messages_keys.chat_clear;
 
 const ROLE_MODERATOR = Meteor.settings.public.user.role_moderator;
 
-const CONNECTION_STATUS_ONLINE = 'online';
-
 const ScrollCollection = new Mongo.Collection(null);
 
 const UnsentMessagesCollection = new Mongo.Collection(null);
@@ -42,39 +40,10 @@ const getUser = (userId) => {
 
 const getMeeting = () => Meetings.findOne({});
 
-const mapGroupMessage = (message) => {
-  const mappedMessage = {
-    id: message._id,
-    content: message.content,
-    time: message.timestamp,
-    sender: null,
-  };
-
-  if (message.sender !== SYSTEM_CHAT_TYPE) {
-    const sender = getUser(message.sender);
-    const {
-      color,
-      role,
-      name,
-      connectionStatus,
-    } = sender;
-
-    const mappedSender = {
-      color,
-      isModerator: role === ROLE_MODERATOR,
-      name,
-      isOnline: connectionStatus === CONNECTION_STATUS_ONLINE,
-    };
-
-    mappedMessage.sender = mappedSender;
-  }
-
-  return mappedMessage;
-};
-
-const reduceGroupMessages = (previous, current) => {
+const messageReductionFunc = (previous, current) => {
   const lastMessage = previous[previous.length - 1];
   const currentMessage = current;
+
   currentMessage.content = [{
     id: current.id,
     text: current.message,
@@ -87,7 +56,7 @@ const reduceGroupMessages = (previous, current) => {
   // between the two messages exceeds window and then group current message
   // with the last one
   const timeOfLastMessage = lastMessage.content[lastMessage.content.length - 1].time;
-  if (lastMessage.sender === currentMessage.sender
+  if (lastMessage.senderId === currentMessage.senderId
     && (currentMessage.timestamp - timeOfLastMessage) <= GROUPING_MESSAGES_WINDOW) {
     lastMessage.content.push(currentMessage.content.pop());
     return previous;
@@ -96,8 +65,8 @@ const reduceGroupMessages = (previous, current) => {
   return previous.concat(currentMessage);
 };
 
-const reduceAndMapGroupMessages = messages => (messages
-  .reduce(reduceGroupMessages, []).map(mapGroupMessage));
+const reduceGroupMessages = messages => (messages
+  .reduce(messageReductionFunc, []));
 
 const getPublicGroupMessages = () => {
   const publicGroupMessages = GroupChatMsg.find({
@@ -127,7 +96,7 @@ const getPrivateGroupMessages = () => {
     }, { sort: ['timestamp'] }).fetch();
   }
 
-  return reduceAndMapGroupMessages(messages, []);
+  return reduceGroupMessages(messages, []);
 };
 
 const isChatLocked = (receiverID) => {
@@ -280,7 +249,7 @@ const exportChat = (messageList) => {
     if (message.type === SYSTEM_CHAT_TYPE) {
       return `${hourMin} ${message.message}`;
     }
-    const userName = message.sender === PUBLIC_CHAT_USER_ID ? '' : `${getUser(message.sender).name} :`;
+    const userName = message.senderId === PUBLIC_CHAT_USER_ID ? '' : `${message.senderName} :`;
     return `${hourMin} ${userName} ${htmlDecode(message.message)}`;
   }).join('\n');
 };
@@ -289,7 +258,7 @@ const getUnreadMessagesFromChatId = chatId => UnreadMessages.getUnreadMessages(c
 
 const getAllMessages = (chatID) => {
   const filter = {
-    sender: { $ne: Auth.userID },
+    senderId: { $ne: Auth.userID },
   };
   if (chatID === PUBLIC_GROUP_CHAT_ID) {
     filter.chatId = { $eq: chatID };
@@ -319,7 +288,7 @@ const getLastMessageTimestampFromChatList = activeChats => activeChats
   .reduce(maxNumberReducer, 0);
 
 export default {
-  reduceAndMapGroupMessages,
+  reduceGroupMessages,
   getPublicGroupMessages,
   getPrivateGroupMessages,
   getUser,

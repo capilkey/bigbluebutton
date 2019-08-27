@@ -5,11 +5,15 @@ import _ from 'lodash';
 const propTypes = {
   text: PropTypes.string.isRequired,
   time: PropTypes.number.isRequired,
-  unread: PropTypes.bool.isRequired,
+  lastReadMessageTime: PropTypes.number,
+  handleReadMessage: PropTypes.func.isRequired,
+  scrollArea: PropTypes.instanceOf(Element),
+  className: PropTypes.string.isRequired,
 };
 
 const defaultProps = {
-  unread: true,
+  lastReadMessageTime: 0,
+  scrollArea: undefined,
 };
 
 const eventsToBeBound = [
@@ -38,14 +42,72 @@ export default class MessageListItem extends PureComponent {
     this.handleMessageInViewport = _.debounce(this.handleMessageInViewport.bind(this), 50);
   }
 
-  handleMessageInViewport(e) {
+  componentDidMount() {
+    this.listenToUnreadMessages();
+  }
+
+  componentDidUpdate() {
+    this.listenToUnreadMessages();
+  }
+
+  componentWillUnmount() {
+    const {
+      // lastReadMessageTime,
+      // time,
+      scrollArea,
+    } = this.props;
+
+    // This was added 3 years ago, but never worked. Leaving it around in case someone returns
+    // and decides it needs to be fixed like the one in listenToUnreadMessages()
+    // if (!lastReadMessageTime > time) {
+    //  return;
+    // }
+
+    if (scrollArea) {
+      eventsToBeBound.forEach(
+        (e) => { scrollArea.removeEventListener(e, this.handleMessageInViewport, false); },
+      );
+    }
+  }
+
+  // depending on whether the message is in viewport or not,
+  // either read it or attach a listener
+  listenToUnreadMessages() {
+    const {
+      lastReadMessageTime,
+      time,
+      scrollArea,
+      handleReadMessage,
+    } = this.props;
+
+    if (lastReadMessageTime > time) {
+      return;
+    }
+
+    const node = this.text;
+
+    if (isElementInViewport(node)) { // no need to listen, the message is already in viewport
+      handleReadMessage(time);
+    } else if (scrollArea) {
+      eventsToBeBound.forEach(
+        (e) => { scrollArea.addEventListener(e, this.handleMessageInViewport, false); },
+      );
+    }
+  }
+
+  handleMessageInViewport() {
+    const {
+      scrollArea,
+      handleReadMessage,
+      time,
+    } = this.props;
+
     if (!this.ticking) {
       window.requestAnimationFrame(() => {
         const node = this.text;
-        const { scrollArea } = this.props;
 
         if (isElementInViewport(node)) {
-          this.props.handleReadMessage(this.props.time);
+          handleReadMessage(time);
           if (scrollArea) {
             eventsToBeBound.forEach(
               e => scrollArea.removeEventListener(e, this.handleMessageInViewport),
@@ -60,62 +122,21 @@ export default class MessageListItem extends PureComponent {
     this.ticking = true;
   }
 
-  // depending on whether the message is in viewport or not,
-  // either read it or attach a listener
-  listenToUnreadMessages() {
-    if (!this.props.lastReadMessageTime > this.props.time) {
-      return;
-    }
-
-    const node = this.text;
-    const { scrollArea } = this.props;
-
-    if (isElementInViewport(node)) { // no need to listen, the message is already in viewport
-      this.props.handleReadMessage(this.props.time);
-    } else if (scrollArea) {
-      eventsToBeBound.forEach(
-        (e) => { scrollArea.addEventListener(e, this.handleMessageInViewport, false); },
-      );
-    }
-  }
-
-  componentDidMount() {
-    this.listenToUnreadMessages();
-  }
-
-  componentWillUnmount() {
-    if (!this.props.lastReadMessageTime > this.props.time) {
-      return;
-    }
-
-    const { scrollArea } = this.props;
-
-    if (scrollArea) {
-      eventsToBeBound.forEach(
-        (e) => { scrollArea.removeEventListener(e, this.handleMessageInViewport, false); },
-      );
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    this.listenToUnreadMessages();
-  }
-
   render() {
     const {
       text,
-      time,
+      className,
     } = this.props;
 
     return (
       <p
         ref={(ref) => { this.text = ref; }}
         dangerouslySetInnerHTML={{ __html: text }}
-        className={this.props.className}
+        className={className}
       />
     );
   }
 }
 
-MessageListItem.propTypes = propTypes;
 MessageListItem.defaultProps = defaultProps;
+MessageListItem.propTypes = propTypes;
