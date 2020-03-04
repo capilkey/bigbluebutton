@@ -6,6 +6,9 @@ import cx from 'classnames';
 import { styles } from '/imports/ui/components/user-list/user-list-content/styles';
 import _ from 'lodash';
 import { findDOMNode } from 'react-dom';
+import {
+  List, AutoSizer, CellMeasurer, CellMeasurerCache,
+} from 'react-virtualized';
 import UserListItemContainer from './user-list-item/container';
 import UserOptionsContainer from './user-options/container';
 
@@ -47,6 +50,11 @@ class UserParticipants extends Component {
   constructor() {
     super();
 
+    this.cache = new CellMeasurerCache({
+      fixedWidth: true,
+      keyMapper: () => 1,
+    });
+
     this.state = {
       selectedUser: null,
     };
@@ -56,7 +64,7 @@ class UserParticipants extends Component {
     this.getScrollContainerRef = this.getScrollContainerRef.bind(this);
     this.rove = this.rove.bind(this);
     this.changeState = this.changeState.bind(this);
-    this.getUsers = this.getUsers.bind(this);
+    this.rowRenderer = this.rowRenderer.bind(this);
   }
 
   componentDidMount() {
@@ -94,7 +102,9 @@ class UserParticipants extends Component {
     return this.refScrollContainer;
   }
 
-  getUsers() {
+  rowRenderer({
+    index, parent, style, key,
+  }) {
     const {
       compact,
       setEmojiStatus,
@@ -104,20 +114,20 @@ class UserParticipants extends Component {
       meetingIsBreakout,
     } = this.props;
 
-    let index = -1;
+    const user = users[index];
 
-    return users.map(u => (
-      <CSSTransition
-        classNames={listTransition}
-        appear
-        enter
-        exit
-        timeout={0}
-        component="div"
-        className={cx(styles.participantsList)}
-        key={u.userId}
+    return (
+      <CellMeasurer
+        key={key}
+        cache={this.cache}
+        columnIndex={0}
+        parent={parent}
+        rowIndex={index}
       >
-        <div ref={(node) => { this.userRefs[index += 1] = node; }}>
+        <span
+          style={style}
+          key={key}
+        >
           <UserListItemContainer
             {...{
               compact,
@@ -126,12 +136,13 @@ class UserParticipants extends Component {
               currentUser,
               meetingIsBreakout,
             }}
-            user={u}
+            user={user}
+
             getScrollContainerRef={this.getScrollContainerRef}
           />
-        </div>
-      </CSSTransition>
-    ));
+        </span>
+      </CellMeasurer>
+    );
   }
 
   rove(event) {
@@ -183,15 +194,23 @@ class UserParticipants extends Component {
             : <hr className={styles.separator} />
         }
         <div
-          className={styles.scrollableList}
+          className={styles.scrollableList2}
           tabIndex={0}
           ref={(ref) => { this.refScrollContainer = ref; }}
         >
-          <div className={styles.list}>
-            <TransitionGroup ref={(ref) => { this.refScrollItems = ref; }}>
-              {this.getUsers()}
-            </TransitionGroup>
-          </div>
+          <AutoSizer>
+            {({ height, width }) => (
+              <List
+                rowHeight={this.cache.rowHeight}
+                rowRenderer={this.rowRenderer}
+                rowCount={users.length}
+                height={height - 1}
+                width={width - 1}
+                overscanRowCount={5}
+                deferredMeasurementCache={this.cache}
+              />
+            )}
+          </AutoSizer>
         </div>
       </div>
     );

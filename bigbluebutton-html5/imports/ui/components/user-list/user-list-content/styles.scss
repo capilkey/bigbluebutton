@@ -36,6 +36,34 @@
   outline-color: transparent !important;
 }
 
+.scrollableList2 {
+  @include elementFocus(var(--list-item-bg-hover));
+  @include scrollbox-vertical(var(--user-list-bg));
+  @include highContrastOutline();
+
+  &:focus-within,
+  &:focus {
+    outline-style: solid;
+  }
+
+  &:active {
+    box-shadow: none;
+    border-radius: none;
+  }
+
+  outline-width: 1px !important;
+  outline-color: transparent !important;
+
+  flex-grow: 1;
+  flex-shrink: 1;
+
+  margin: 0 0 1px var(--md-padding-y);
+
+  [dir="rtl"] & {
+    margin: 0 var(--md-padding-y) 1px 0;
+  }
+}
+
 .list {
   margin: 0 0 1px var(--md-padding-y);
 
